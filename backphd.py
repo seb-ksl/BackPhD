@@ -21,6 +21,7 @@
 #
 
 import os
+import subprocess
 import sys
 
 
@@ -55,8 +56,8 @@ def create_folder(folders):
 
 def backup(folder):
     if os.access('/media/' + folder + '/PhD_backup', os.W_OK):
-        os.execl('/usr/bin/rsync', '/usr/bin/rsync', '-taurv', '--delete', '/home/seb/PhD/',
-                 '/media/' + folder + '/PhD_backup/')
+        subprocess.call(['/usr/bin/rsync', '-taurv', '--delete', '/home/seb/PhD/',
+                 '/media/' + folder + '/PhD_backup/'])
     else:
         print('Not allowed to write to backup disk ' + folder + '.\nBackup not done.')
 
@@ -77,7 +78,7 @@ def main():
                         do_unmount = ask('Unmount backup disk?', ['y', 'n'])
 
                         if do_unmount == 'y':
-                            os.execl('/usr/bin/pumount', '/usr/bin/pumount', folder)
+                            subprocess.call(['/usr/bin/pumount', folder])
 
             else:
                 do_create = ask('Create backup folder?', ['y', 'n'])
@@ -88,6 +89,9 @@ def main():
 
         else:
             print('No USB drive detected.')
+
+    else:
+        print('This script requires rsync and pumount to be installed.')
 
 
 if __name__ == '__main__':
