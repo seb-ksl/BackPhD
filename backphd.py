@@ -39,7 +39,7 @@ def ask(question, valid_answers):
 def get_backup_folder():
     folders_dic = {}
 
-    media_folder = os.listdir('/media')
+    media_folder = os.listdir('/media/')
     for subfolder in media_folder:
         if subfolder.startswith('sd'):
             if 'PhD_backup' in os.listdir('/media/' + subfolder):
@@ -50,14 +50,30 @@ def get_backup_folder():
 
 
 def create_folder(folders):
-    folder_to_create = ask('Where to create backup folder?', list(folders.keys()))
+    folders.sort()
+
+    # Create a dictionary containing labels and their corresponding disk
+    labels = {}
+    for label in os.listdir('/dev/disk/by-label/'):
+        file = os.readlink('/dev/disk/by-label/' + label).split('/')[-1]
+        if file in folders:
+            labels[file] = label
+
+    # Print available disks with label if available in labels dictionary
+    print('\nAvailable disks:')
+    for folder in folders:
+        if folder in labels.keys():
+            print(folder + ' (' + labels[folder] + ') ')
+        else:
+            print(folder)
+
+    folder_to_create = ask('Where to create backup folder?', list(folders))
     os.mkdir('/media/' + folder_to_create + '/PhD_backup')
 
 
 def backup(folder):
     if os.access('/media/' + folder + '/PhD_backup', os.W_OK):
-        subprocess.call(['/usr/bin/rsync', '-taurv', '--delete', '/home/seb/PhD/',
-                 '/media/' + folder + '/PhD_backup/'])
+        subprocess.call(['/usr/bin/rsync', '-taurv', '--delete', '/home/seb/PhD/', '/media/' + folder + '/PhD_backup/'])
     else:
         print('Not allowed to write to backup disk ' + folder + '.\nBackup not done.')
 
@@ -84,7 +100,7 @@ def main():
                 do_create = ask('Create backup folder?', ['y', 'n'])
 
                 if do_create == 'y':
-                    create_folder(folders)
+                    create_folder(list(folders.keys()))
                     main()
 
         else:
