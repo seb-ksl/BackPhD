@@ -73,7 +73,7 @@ def create_folder(folders):
 
 def backup(folder):
     if os.access('/media/' + folder + '/PhD_backup', os.W_OK):
-        subprocess.call(['/usr/bin/rsync', '-taurv', '--delete', '/home/seb/PhD/', '/media/' + folder + '/PhD_backup/'])
+        subprocess.call(['/usr/bin/rsync', '-taurv', '--delete', '--exclude=/Data_Thomas', '/home/seb/PhD/', '/media/' + folder + '/PhD_backup/'])
     else:
         print('Not allowed to write to backup disk ' + folder + '.\nBackup not done.')
 
